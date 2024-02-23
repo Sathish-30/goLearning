@@ -25,8 +25,10 @@ func main() {
 	app.HandleFunc("POST /addUser", handler.AddUserHandler)
 	app.HandleFunc("DELETE /deleteUser/", handler.DeleteUserByIdHandler)
 
+
 	port := fmt.Sprintf(":%d", 8000)
 	if err := http.ListenAndServe(port, wrappedServer); err != nil {
 		log.Fatal(err)
 	}
+   
 }
