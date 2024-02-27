@@ -1,44 +1,40 @@
 package auth
 
 import (
-	"github.com/golang-jwt/jwt/v5"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
+var secretKey string = string(os.Getenv("SECRET"))
+
 func AuthWithJWT(next http.Handler) http.Handler {
-	return http.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("token")
-		log.Fatal(cookie)
-		if err != nil {
-			if err != http.ErrNoCookie {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract the JWT token from the Authorization header
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprint(w, "Unauthorized access: Token missing\n")
 			return
 		}
 
-		tokenString := cookie.Value
-		token, err := jwt.ParseWithClaims(tokenString, , func(token *jwt.Token) (interface{}, error) {
-			secretKey := []byte(os.Getenv("SECRET"))
+		// Parse the JWT token
+		token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
 		})
 
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		if !token.Valid {
 			w.WriteHeader(http.StatusUnauthorized)
+			fmt.Fprint(w, "Unauthorized access: Invalid token\n")
 			return
+		} else if claims, ok := token.Claims.(*CustomClaims); ok {
+			log.Println(claims.Name, claims.RegisteredClaims)
+		} else {
+			log.Fatal("Unknown claim types")
 		}
-
 		next.ServeHTTP(w, r)
 	})
 }

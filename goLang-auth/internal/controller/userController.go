@@ -76,15 +76,12 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expirationTime := time.Now().Add(time.Minute * 5).Unix()
-
-	standardClaims := jwt.StandardClaims{
-		ExpiresAt: expirationTime,
-	}
-
-	claims := &auth.Claims{
-		Name:           user.Email,
-		StandardClaims: standardClaims,
+	expirationTime := time.Now().Add(time.Minute * 5)
+	claims := auth.CustomClaims{
+		Name: user.Email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims)
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
@@ -115,5 +112,9 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"Message": "User logged In",
+	})
 }

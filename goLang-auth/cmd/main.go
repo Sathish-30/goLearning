@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/sathish-30/golang-auth/initializers"
+	"github.com/sathish-30/golang-auth/internal/auth"
 	"github.com/sathish-30/golang-auth/internal/controller"
 	"github.com/sathish-30/golang-auth/internal/database"
 )
@@ -30,6 +31,8 @@ func main() {
 	server.HandleFunc("POST /signUp", controller.SignUp)
 
 	server.HandleFunc("POST /login", controller.LoginUser)
+
+	server.Handle("/home", auth.AuthWithJWT(http.HandlerFunc(controller.Home)))
 
 	// Listening to the port number which has been obtained from the .env file
 	if err := http.ListenAndServe(port, server); err != nil {
