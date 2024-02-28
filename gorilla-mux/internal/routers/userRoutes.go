@@ -8,7 +8,7 @@ import (
 func UserRoutes(router *mux.Router) {
 	userRoute := router.PathPrefix("/user").Subrouter()
 	// User home route
-	userRoute.HandleFunc("/", controller.HandleUserHomeRoute)
+	userRoute.HandleFunc("/", controller.HandleUserHomeRoute).Methods("GET")
 
-	userRoute.HandleFunc("POST /login", controller.HandleUserLogin)
+	userRoute.HandleFunc("/login", controller.HandleUserLogin).Methods("POST")
 }

@@ -17,8 +17,8 @@ func init() {
 
 func main() {
 	router := mux.NewRouter()
-	fs := http.FileServer(http.Dir("static"))
+	fs := http.FileServer(http.Dir("./static"))
 	router.Handle("/static/", http.StripPrefix("/static/", fs))
 	routers.UserRoutes(router)
-	http.ListenAndServe(":8000", router)
+	http.ListenAndServe(":8080", router)
 }
