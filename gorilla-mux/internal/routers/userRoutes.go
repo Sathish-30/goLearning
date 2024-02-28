@@ -9,4 +9,6 @@ func UserRoutes(router *mux.Router) {
 	userRoute := router.PathPrefix("/user").Subrouter()
 	// User home route
 	userRoute.HandleFunc("/", controller.HandleUserHomeRoute)
+
+	userRoute.HandleFunc("POST /login", controller.HandleUserLogin)
 }
