@@ -40,6 +40,8 @@ func makeHttpHandleFunc(f handler.ApiFuncCall) http.HandlerFunc {
 func (server *Server) run() {
 	router := http.NewServeMux()
 	router.HandleFunc("/", makeHttpHandleFunc(handler.HomeRouteHandler))
+	router.HandleFunc("/getBooks", makeHttpHandleFunc(handler.GetAllBooksHandler))
+	router.HandleFunc("POST /addBook", makeHttpHandleFunc(handler.AddBookToShop))
 	log.Println("Json api server is running on the port ", server.listenAddr)
 	http.ListenAndServe(server.listenAddr, router)
 }
